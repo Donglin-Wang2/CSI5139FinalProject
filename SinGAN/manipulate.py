@@ -155,17 +155,56 @@ def generate_gif(Gs,Zs,reals,NoiseAmp,opt,alpha=0.1,beta=0.9,start_scale=2,fps=1
 #     return I_curr.detach()
 
 # def SinGAN_generate(Gs,Zs,reals,NoiseAmp,opt,in_s=None,scale_v=1,scale_h=1,n=0,gen_start_scale=0,num_samples=5):
-#     #if torch.is_tensor(in_s) == False:
+#     real = functions.read_image(opt)
+    
+
+#     real = real.numpy()
+#     real = resize(real, reals[-1].shape)
+#     real = torch.from_numpy(real)
+    
+    
+#     new_reals = creat_reals_pyramid(real,[],opt)
+#     buffer = []
+
+#     for new_real, real in zip(new_reals, reals):
+#         ele = new_real.numpy()
+#         ele = resize(ele, real.shape)
+#         ele= torch.from_numpy(ele)
+#         buffer.append(ele)
+#     reals = buffer
+
+#     for i, real_img in enumerate(reals):
+#         dir2save = '%s/RandomSamples/%s/gen_start_scale=%d' % (opt.out, opt.input_name[:-4], gen_start_scale)
+#         plt.imsave('%s/%s_%d.png' % (dir2save, "real", i), functions.convert_image_np(real_img.detach()), vmin=0,vmax=1)
+        
 #     if in_s is None:
 #         in_s = torch.full(reals[0].shape, 0, device=opt.device)
 #     images_cur = []
+
 #     for G,Z_opt,noise_amp in zip(Gs,Zs,NoiseAmp):
 #         pad1 = ((opt.ker_size-1)*opt.num_layer)/2
 #         m = nn.ZeroPad2d(int(pad1))
 #         nzx = (Z_opt.shape[2]-pad1*2)*scale_v
 #         nzy = (Z_opt.shape[3]-pad1*2)*scale_h
 
+#         # if n == 0:
+#         #     images_prev = images_cur
+#         # else:
+#         #     new_img_prev = []
+#         #     for img in images_cur:
+#         #         ele = reals[n].numpy()
+#         #         ele = resize(ele, img.shape)
+#         #         ele = torch.from_numpy(ele)
+#         #         new_img_prev.append(ele)
+#         #     images_prev = new_img_prev
+
 #         images_prev = images_cur
+
+#         if n != 0:
+#             dir2save = '%s/RandomSamples/%s/gen_start_scale=%d' % (opt.out, opt.input_name[:-4], gen_start_scale)
+#             plt.imsave('%s/%s_%d.png' % (dir2save, "img_cur", n), functions.convert_image_np(images_prev[0].detach()), vmin=0,vmax=1)
+#             plt.imsave('%s/%s_%d.png' % (dir2save, "img_prev", n), functions.convert_image_np(images_cur[0].detach()), vmin=0,vmax=1)
+
 #         images_cur = []
 
 #         for i in range(0,num_samples,1):
@@ -179,9 +218,7 @@ def generate_gif(Gs,Zs,reals,NoiseAmp,opt,alpha=0.1,beta=0.9,start_scale=2,fps=1
 
 #             if images_prev == []:
 #                 I_prev = m(in_s)
-#                 #I_prev = m(I_prev)
-#                 #I_prev = I_prev[:,:,0:z_curr.shape[2],0:z_curr.shape[3]]
-#                 #I_prev = functions.upsampling(I_prev,z_curr.shape[2],z_curr.shape[3])
+        
 #             else:
 #                 I_prev = images_prev[i]
 #                 I_prev = imresize(I_prev,1/opt.scale_factor, opt)
@@ -196,27 +233,29 @@ def generate_gif(Gs,Zs,reals,NoiseAmp,opt,alpha=0.1,beta=0.9,start_scale=2,fps=1
 #             if n < gen_start_scale:
 #                 z_curr = Z_opt
 
+          
 #             z_in = noise_amp*(z_curr)+I_prev
 #             I_curr = G(z_in.detach(),I_prev)
 
             
-#             if opt.mode == 'train':
-#                 dir2save = '%s/RandomSamples/%s/gen_start_scale=%d' % (opt.out, opt.input_name[:-4], gen_start_scale)
-#             else:
-#                 dir2save = functions.generate_dir2save(opt)
-#             try:
-#                 os.makedirs(dir2save)
-#             except OSError:
-#                 pass
-#             if (opt.mode != "harmonization") & (opt.mode != "editing") & (opt.mode != "SR") & (opt.mode != "paint2image"):
-#                 plt.imsave('%s/%d_%d.png' % (dir2save, i, n), functions.convert_image_np(I_curr.detach()), vmin=0,vmax=1)
-#                 #plt.imsave('%s/%d_%d.png' % (dir2save,i,n),functions.convert_image_np(I_curr.detach()), vmin=0, vmax=1)
-#                 #plt.imsave('%s/in_s.png' % (dir2save), functions.convert_image_np(in_s), vmin=0,vmax=1)
-            
+#             if n == len(reals)-1:
+#                 if opt.mode == 'train':
+#                     dir2save = '%s/RandomSamples/%s/gen_start_scale=%d' % (opt.out, opt.input_name[:-4], gen_start_scale)
+#                 else:
+#                     dir2save = functions.generate_dir2save(opt)
+#                 try:
+#                     os.makedirs(dir2save)
+#                 except OSError:
+#                     pass
+#                 if (opt.mode != "harmonization") & (opt.mode != "editing") & (opt.mode != "SR") & (opt.mode != "paint2image"):
+#                     plt.imsave('%s/%d.png' % (dir2save, i), functions.convert_image_np(I_curr.detach()), vmin=0,vmax=1)
+#                     # plt.imsave('%s/%d_%d.png' % (dir2save, i, n), functions.convert_image_np(I_curr.detach()), vmin=0,vmax=1)
 #             images_cur.append(I_curr)
 #         n+=1
 #     return I_curr.detach()
-def SinGAN_generate(Gs,Zs,reals,NoiseAmp,opt,in_s=None,scale_v=1,scale_h=1,n=0,gen_start_scale=0,num_samples=5):
+
+
+def SinGAN_generate(Gs,Zs,reals,NoiseAmp,opt,in_s=None,scale_v=1,scale_h=1,n=0,gen_start_scale=0,num_samples=50):
     real = functions.read_image(opt)
     
 
@@ -262,10 +301,10 @@ def SinGAN_generate(Gs,Zs,reals,NoiseAmp,opt,in_s=None,scale_v=1,scale_h=1,n=0,g
 
         images_prev = images_cur
 
-        if n != 0:
-            dir2save = '%s/RandomSamples/%s/gen_start_scale=%d' % (opt.out, opt.input_name[:-4], gen_start_scale)
-            plt.imsave('%s/%s_%d.png' % (dir2save, "img_cur", n), functions.convert_image_np(images_prev[0].detach()), vmin=0,vmax=1)
-            plt.imsave('%s/%s_%d.png' % (dir2save, "img_prev", n), functions.convert_image_np(images_cur[0].detach()), vmin=0,vmax=1)
+        # if n != 0:
+        #     dir2save = '%s/RandomSamples/%s/gen_start_scale=%d' % (opt.out, opt.input_name[:-4], gen_start_scale)
+        #     plt.imsave('%s/%s_%d.png' % (dir2save, "img_cur", n), functions.convert_image_np(images_prev[0].detach()), vmin=0,vmax=1)
+        #     plt.imsave('%s/%s_%d.png' % (dir2save, "img_prev", n), functions.convert_image_np(images_cur[0].detach()), vmin=0,vmax=1)
 
         images_cur = []
 
@@ -297,7 +336,10 @@ def SinGAN_generate(Gs,Zs,reals,NoiseAmp,opt,in_s=None,scale_v=1,scale_h=1,n=0,g
 
           
             z_in = noise_amp*(z_curr)+I_prev
-            I_curr = G(z_in.detach(),I_prev)
+            if opt.skip != '' and int(opt.skip) == n:
+                I_curr = I_prev
+            else:
+                I_curr = G(z_in.detach(),I_prev)
 
             
             if n == len(reals)-1:

@@ -29,6 +29,7 @@ def get_arguments():
     parser.add_argument('--noise_amp',type=float,help='addative noise cont weight',default=0.1)
     parser.add_argument('--min_size',type=int,help='image minimal size at the coarser scale',default=25)
     parser.add_argument('--max_size', type=int,help='image minimal size at the coarser scale', default=250)
+    parser.add_argument('--skip', type=str, default='', help='the GD level that you want to skip')
 
     #optimization hyper parameters:
     parser.add_argument('--niter', type=int, default=1000, help='number of epochs to train per scale')
