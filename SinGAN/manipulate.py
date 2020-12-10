@@ -287,7 +287,7 @@ def SinGAN_generate(Gs,Zs,reals,NoiseAmp,opt,in_s=None,scale_v=1,scale_h=1,n=0,g
         m = nn.ZeroPad2d(int(pad1))
         nzx = (Z_opt.shape[2]-pad1*2)*scale_v
         nzy = (Z_opt.shape[3]-pad1*2)*scale_h
-
+        # For Section IV
         # if n == 0:
         #     images_prev = images_cur
         # else:
@@ -354,6 +354,19 @@ def SinGAN_generate(Gs,Zs,reals,NoiseAmp,opt,in_s=None,scale_v=1,scale_h=1,n=0,g
                 if (opt.mode != "harmonization") & (opt.mode != "editing") & (opt.mode != "SR") & (opt.mode != "paint2image"):
                     plt.imsave('%s/%d.png' % (dir2save, i), functions.convert_image_np(I_curr.detach()), vmin=0,vmax=1)
                     # plt.imsave('%s/%d_%d.png' % (dir2save, i, n), functions.convert_image_np(I_curr.detach()), vmin=0,vmax=1)
+            
+            # For Section VI
+            # if opt.mode == 'train':
+            #     dir2save = '%s/RandomSamples/%s/gen_start_scale=%d' % (opt.out, opt.input_name[:-4], gen_start_scale)
+            # else:
+            #     dir2save = functions.generate_dir2save(opt)
+            # try:
+            #     os.makedirs(dir2save)
+            # except OSError:
+            #     pass
+            # if (opt.mode != "harmonization") & (opt.mode != "editing") & (opt.mode != "SR") & (opt.mode != "paint2image"):
+            #     plt.imsave('%s/%d_%d.png' % (dir2save, i, n), functions.convert_image_np(I_curr.detach()), vmin=0,vmax=1)
+
             images_cur.append(I_curr)
         n+=1
     return I_curr.detach()
